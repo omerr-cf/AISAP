@@ -1,0 +1,47 @@
+{
+  "header": {
+    "brand": "a|sap",
+    "subtitle": "Echo Study Review"
+  },
+  "studies": {
+    "title": "Echo Studies",
+    "subtitle": "Review echocardiography studies and patient records",
+    "showing": "Showing {{from}}–{{to}} of {{total}} studies",
+    "noResults": "No studies match your filters.",
+    "loadError": "Failed to load studies."
+  },
+  "filters": {
+    "searchPlaceholder": "Search by patient name...",
+    "lvefAll": "All LVEF",
+    "lvefNormal": "Normal (≥55%)",
+    "lvefMild": "Mildly Reduced (40–54%)",
+    "lvefSevere": "Severely Reduced (<40%)"
+  },
+  "pagination": {
+    "prev": "← Prev",
+    "next": "Next →",
+    "pageLabel": "Page {{page}}"
+  },
+  "study": {
+    "patientInfo": "Patient Information",
+    "studyInfo": "Study Information",
+    "lvefSection": "LVEF",
+    "name": "Name",
+    "patientId": "Patient ID",
+    "date": "Study Date",
+    "indication": "Indication",
+    "status": "Status",
+    "backToStudies": "← Back to Studies",
+    "notFound": "Study not found.",
+    "loadError": "Failed to load study."
+  },
+  "status": {
+    "pending": "Pending",
+    "reviewed": "Reviewed"
+  },
+  "common": {
+    "retry": "Try again",
+    "loading": "Loading",
+    "error": "Something went wrong."
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "aisap-echo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.95.2",
+    "@tanstack/react-query-devtools": "^5.95.2",
+    "axios": "^1.13.6",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "fp-ts": "^2.16.11",
+    "i18next": "^25.10.10",
+    "next": "16.2.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-i18next": "^16.6.6",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   AISAP Brand Tokens — Tailwind v4 CSS-first configuration
+   Extracted from aisap.ai: dark-first design with a single lime-green accent.
+   Token names map directly to Tailwind utilities:
+     --color-brand  →  bg-brand / text-brand / border-brand
+     --color-surface → bg-surface
+   --------------------------------------------------------------------------- */
+
+@theme {
+  /* Surface — dark background system */
+  --color-surface:        #0a0a0f; /* page background */
+  --color-surface-card:   #111118; /* card / panel backgrounds */
+  --color-surface-border: #1e1e2a; /* subtle dividers, card edges */
+
+  /* Brand accent — AISAP lime green */
+  --color-brand:       #7bf26c; /* primary actions, active indicators, focus rings */
+  --color-brand-light: #c8f5d8; /* button fills, soft highlights */
+  --color-brand-dim:   #3b7a34; /* hover / pressed state */
+  --color-brand-glow:  #7bf26c33; /* translucent — glow borders, shadows */
+
+  /* Text */
+  --color-content-primary:   #ffffff;
+  --color-content-secondary: #a0a0b0;
+  --color-content-muted:     #60607a;
+
+  /* LVEF clinical status colors
+     Intentionally distinct from brand palette — clinical clarity first.
+     Normal reuses brand green for aesthetic alignment; amber and red
+     carry universal "caution" and "critical" semantics. */
+  --color-lvef-normal: #7bf26c; /* brand green — Normal (>=55%)        */
+  --color-lvef-mild:   #f5a623; /* amber        — Mildly Reduced (40-54%) */
+  --color-lvef-severe: #ef4444; /* red          — Severely Reduced (<40%) */
+
+  /* Fonts — wired from next/font in layout.tsx */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Box shadows */
+  --shadow-brand-glow: 0 0 0 2px #7bf26c33, 0 0 12px #7bf26c22;
+}
+
+/* Base document styles */
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background-color: var(--color-surface);
+  color: var(--color-content-primary);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

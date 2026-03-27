@@ -1,0 +1,152 @@
+[
+  {
+    "id": "1",
+    "patientName": "Amelia Haddad",
+    "patientId": "P-97922",
+    "studyDate": "2025-12-22",
+    "indication": "Syncope",
+    "lvef": 67,
+    "status": "pending",
+    "thumbnailUrl": "https://picsum.photos/seed/study-001-97922/150/150"
+  },
+  {
+    "id": "2",
+    "patientName": "Charlotte Katz",
+    "patientId": "P-41965",
+    "studyDate": "2024-11-05",
+    "indication": "Hypertension",
+    "lvef": 34,
+    "status": "reviewed",
+    "thumbnailUrl": "https://picsum.photos/seed/study-002-41965/150/150"
+  },
+  {
+    "id": "3",
+    "patientName": "Benjamin Barak",
+    "patientId": "P-43483",
+    "studyDate": "2023-08-07",
+    "indication": "Pre-op evaluation",
+    "lvef": 44,
+    "status": "reviewed",
+    "thumbnailUrl": "https://picsum.photos/seed/study-003-43483/150/150"
+  },
+  {
+    "id": "4",
+    "patientName": "Michael Cohen",
+    "patientId": "P-35418",
+    "studyDate": "2025-04-28",
+    "indication": "Cardiomyopathy",
+    "lvef": 47,
+    "status": "pending",
+    "thumbnailUrl": "https://picsum.photos/seed/study-004-35418/150/150"
+  },
+  {
+    "id": "5",
+    "patientName": "William Stern",
+    "patientId": "P-22628",
+    "studyDate": "2017-01-06",
+    "indication": "Chest pain",
+    "lvef": 75,
+    "status": "reviewed",
+    "thumbnailUrl": "https://picsum.photos/seed/study-005-22628/150/150"
+  },
+  {
+    "id": "6",
+    "patientName": "Harper Mizrahi",
+    "patientId": "P-71226",
+    "studyDate": "2020-10-14",
+    "indication": "Post-MI assessment",
+    "lvef": 67,
+    "status": "pending",
+    "thumbnailUrl": "https://picsum.photos/seed/study-006-71226/150/150"
+  },
+  {
+    "id": "7",
+    "patientName": "Sophia Levy",
+    "patientId": "P-88341",
+    "studyDate": "2024-03-15",
+    "indication": "Dyspnea",
+    "lvef": 38,
+    "status": "pending",
+    "thumbnailUrl": "https://picsum.photos/seed/study-007-88341/150/150"
+  },
+  {
+    "id": "8",
+    "patientName": "Ethan Shapiro",
+    "patientId": "P-62019",
+    "studyDate": "2023-11-20",
+    "indication": "Palpitations",
+    "lvef": 58,
+    "status": "reviewed",
+    "thumbnailUrl": "https://picsum.photos/seed/study-008-62019/150/150"
+  },
+  {
+    "id": "9",
+    "patientName": "Olivia Ben-David",
+    "patientId": "P-54782",
+    "studyDate": "2025-01-09",
+    "indication": "Valvular disease",
+    "lvef": 52,
+    "status": "pending",
+    "thumbnailUrl": "https://picsum.photos/seed/study-009-54782/150/150"
+  },
+  {
+    "id": "10",
+    "patientName": "Noah Goldstein",
+    "patientId": "P-31104",
+    "studyDate": "2022-07-18",
+    "indication": "Heart failure follow-up",
+    "lvef": 29,
+    "status": "reviewed",
+    "thumbnailUrl": "https://picsum.photos/seed/study-010-31104/150/150"
+  },
+  {
+    "id": "11",
+    "patientName": "Ava Peretz",
+    "patientId": "P-90567",
+    "studyDate": "2024-08-30",
+    "indication": "Shortness of breath",
+    "lvef": 61,
+    "status": "pending",
+    "thumbnailUrl": "https://picsum.photos/seed/study-011-90567/150/150"
+  },
+  {
+    "id": "12",
+    "patientName": "Liam Friedman",
+    "patientId": "P-47833",
+    "studyDate": "2023-05-12",
+    "indication": "Chest pain",
+    "lvef": 43,
+    "status": "reviewed",
+    "thumbnailUrl": "https://picsum.photos/seed/study-012-47833/150/150"
+  },
+  {
+    "id": "13",
+    "patientName": "Isabella Alon",
+    "patientId": "P-73291",
+    "studyDate": "2025-06-04",
+    "indication": "Syncope",
+    "lvef": 70,
+    "status": "pending",
+    "thumbnailUrl": "https://picsum.photos/seed/study-013-73291/150/150"
+  },
+  {
+    "id": "14",
+    "patientName": "James Weiss",
+    "patientId": "P-28456",
+    "studyDate": "2021-12-01",
+    "indication": "Hypertension",
+    "lvef": 55,
+    "status": "reviewed",
+    "thumbnailUrl": "https://picsum.photos/seed/study-014-28456/150/150"
+  },
+  {
+    "id": "15",
+    "patientName": "Mia Rosenberg",
+    "patientId": "P-65920",
+    "studyDate": "2024-02-27",
+    "indication": "Cardiomyopathy",
+    "lvef": 32,
+    "status": "pending",
+    "thumbnailUrl": "https://picsum.photos/seed/study-015-65920/150/150"
+  }
+]
