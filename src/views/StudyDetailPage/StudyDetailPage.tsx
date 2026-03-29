@@ -4,6 +4,7 @@ import { Header } from "@/shared/layout/Header";
 import { Button } from "@/shared/ui/Button";
 import { ErrorState } from "@/shared/ui/ErrorState";
 import { Spinner } from "@/shared/ui/Spinner";
+import { toErrorMessage } from "@/utils/error";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { StudyDetail } from "./StudyDetail";
@@ -38,11 +39,7 @@ export const StudyDetailPage = ({ id }: StudyDetailPageProps) => {
           </div>
         )}
         {isError && (
-          <ErrorState
-            message={
-              error instanceof Error ? error.message : t("study.loadError")
-            }
-          />
+          <ErrorState message={toErrorMessage(error) ?? t("study.loadError")} />
         )}
         {notFound && <ErrorState message={t("study.notFound")} />}
         {study && <StudyDetail study={study} />}

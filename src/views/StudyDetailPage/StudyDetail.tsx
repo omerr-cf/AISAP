@@ -5,8 +5,8 @@ import { Badge } from "@/shared/ui/Badge";
 import { Field } from "@/shared/ui/Field";
 import { Section } from "@/shared/ui/Section";
 import type { Study } from "@/types";
-import { getLVEFCategory } from "@/types";
 import { formatStudyDateLong } from "@/utils/date";
+import { getLVEFCategory } from "@/utils/study";
 import { clsx } from "clsx";
 import { useTranslation } from "react-i18next";
 

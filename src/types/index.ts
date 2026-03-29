@@ -8,11 +8,6 @@ export type {
   StudyStatus,
 } from "@/lib/schemas/study.schema";
 
-export {
-  getLVEFCategory,
-  LVEF_CATEGORY_LABELS,
-  STUDY_STATUS_LABELS,
-} from "@/lib/schemas/study.schema";
 
 // ---------------------------------------------------------------------------
 // UI-only types — not part of the API schema

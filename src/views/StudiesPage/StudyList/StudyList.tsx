@@ -4,6 +4,7 @@ import { Button } from "@/shared/ui/Button";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { ErrorState } from "@/shared/ui/ErrorState";
 import { Skeleton } from "@/shared/ui/Skeleton";
+import { toErrorMessage } from "@/utils/error";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { StudyCard } from "../StudyCard";
@@ -28,7 +29,7 @@ export const StudyList = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-3" aria-label={t("common.loading")}>
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 5 }, (_, i) => (
           <Skeleton key={i} className="h-20" />
         ))}
       </div>
@@ -37,17 +38,15 @@ export const StudyList = () => {
 
   if (isError) {
     return (
-      <ErrorState
-        message={
-          error instanceof Error ? error.message : t("studies.loadError")
-        }
-      />
+      <ErrorState message={toErrorMessage(error) ?? t("studies.loadError")} />
     );
   }
 
   if (pageStudies.length === 0) {
     return <EmptyState message={t("studies.noResults")} />;
   }
+
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
     <div>
@@ -84,7 +83,7 @@ export const StudyList = () => {
             {t("pagination.prev")}
           </Button>
 
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+          {pageNumbers.map((p) => (
             <Button
               key={p}
               variant={p === safePage ? "primary" : "ghost"}

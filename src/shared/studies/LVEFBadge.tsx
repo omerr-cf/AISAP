@@ -1,4 +1,4 @@
-import { getLVEFCategory, LVEF_CATEGORY_LABELS } from "@/types";
+import { getLVEFCategory, LVEF_CATEGORY_LABELS } from "@/utils/study";
 import { clsx } from "clsx";
 
 interface LVEFBadgeProps {
