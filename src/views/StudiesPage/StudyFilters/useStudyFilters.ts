@@ -10,9 +10,7 @@ export const useStudyFilters = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Ref keeps the latest searchParams readable inside callbacks without
-  // making it a useCallback dependency — breaks the searchParams → recreate
-  // → effect → router.replace → searchParams → ... infinite loop.
+  // Ref (not searchParams in deps) avoids router.replace ↔ searchParams churn — infinite navigation loops.
   const searchParamsRef = useRef(searchParams);
   useEffect(() => {
     searchParamsRef.current = searchParams;

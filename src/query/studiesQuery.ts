@@ -11,7 +11,7 @@ export const useStudies = () =>
   useQuery({
     queryKey: STUDIES_QUERY_KEY,
     queryFn: fetchStudies,
-    // Dataset is static (bundled JSON); keep it fresh forever in-session unless refetched manually.
+    // Static dataset requires no background re-fetching; refetch only via explicit retry.
     staleTime: Infinity,
     gcTime: Infinity,
   });

@@ -25,8 +25,7 @@ Canonical container definitions: `Dockerfile` and `docker-compose.yml` (multi-st
 5. [Project structure](#project-structure)
 6. [Pages & UI](#pages--ui)
 7. [Local development](#local-development)
-8. [Color palette & LVEF](#color-palette--lvef-clinical-colors)
-9. [CI pipeline](#ci-pipeline-extra-credit)
+8. [CI pipeline](#ci-pipeline-extra-credit)
 
 ---
 
@@ -175,6 +174,7 @@ export const useStudies = () =>
   useQuery({
     queryKey: STUDIES_QUERY_KEY,
     queryFn: fetchStudies,
+    // staleTime: Infinity — static dataset, no background re-fetch
     staleTime: Infinity,
     gcTime: Infinity,
   });
@@ -245,21 +245,7 @@ npm run dev
 
 **Quality gates:** `npm run type-check` · `npm run lint`
 
----
-
-## Color palette & LVEF clinical colors
-
-Brand and surface colors follow a **dark-first** layout with a single lime accent, aligned with [aisap.ai](https://www.aisap.ai/). **LVEF** uses distinct clinical colors (green / amber / red) so status remains obvious beyond brand styling.
-
-| Role           | Hex                                          | Notes                   |
-| -------------- | -------------------------------------------- | ----------------------- |
-| Page / surface | `#0A0A0F` / `#111118` / `#1E1E2A`            | Backgrounds and borders |
-| Brand          | `#7BF26C` (with light / dim / glow variants) | Primary accent          |
-| LVEF Normal    | `#7BF26C`                                    | ≥55%                    |
-| LVEF Mild      | `#F5A623`                                    | 40–54%                  |
-| LVEF Severe    | `#EF4444`                                    | <40%                    |
-
-Implementation: **`app/globals.css`** defines `@theme` CSS variables (e.g. `--color-brand`, `--color-lvef-mild`); Tailwind v4 maps them to utilities such as `bg-brand`, `text-lvef-mild`.
+Design tokens (brand, surface, LVEF clinical colors) live in **`app/globals.css`** (`@theme`) and are consumed as Tailwind utilities—inspect there rather than duplicating hex values in this document.
 
 ---
 

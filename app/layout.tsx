@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 };
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+  // suppressHydrationWarning on html/body: stabilizes first paint when i18n strings or extensions differ slightly from SSR.
   return (
     <html
       lang="en"
