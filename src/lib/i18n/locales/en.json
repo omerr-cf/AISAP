@@ -18,6 +18,7 @@
     "lvefSevere": "Severely Reduced (<40%)"
   },
   "pagination": {
+    "navLabel": "Pagination Control",
     "prev": "← Prev",
     "next": "Next →",
     "pageLabel": "Page {{page}}"
@@ -32,6 +33,7 @@
     "indication": "Indication",
     "status": "Status",
     "backToStudies": "← Back to Studies",
+    "lvefProgress": "LVEF Progress: {{value}}%",
     "notFound": "Study not found.",
     "loadError": "Failed to load study."
   },

@@ -23,6 +23,6 @@ export const useStudyDetail = (id: string) => {
     isLoading,
     isError,
     error,
-    notFound: !isLoading && !study,
+    notFound: !isLoading && !isError && !study,
   };
 };

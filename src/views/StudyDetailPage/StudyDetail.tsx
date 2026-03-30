@@ -49,7 +49,12 @@ export const StudyDetail = ({ study }: StudyDetailProps) => {
         </div>
         <div
           className="h-2.5 rounded-full bg-surface-border overflow-hidden"
-          aria-hidden="true"
+          role="progressbar"
+          aria-valuenow={study.lvef}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuetext={t("study.lvefProgress", { value: study.lvef })}
+          aria-label={t("study.lvefProgress", { value: study.lvef })}
         >
           <div
             className={clsx(
@@ -59,11 +64,7 @@ export const StudyDetail = ({ study }: StudyDetailProps) => {
               lvefCategory === "severely_reduced" && "bg-lvef-severe",
             )}
             style={{ width: `${study.lvef}%` }}
-            role="progressbar"
-            aria-valuenow={study.lvef}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={`LVEF: ${study.lvef}%`}
+            aria-hidden="true"
           />
         </div>
       </Section>

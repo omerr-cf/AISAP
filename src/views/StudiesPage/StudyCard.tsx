@@ -2,15 +2,10 @@
 
 import { LVEFBadge } from "@/shared/studies/LVEFBadge";
 import { Badge } from "@/shared/ui/Badge";
-import type { Study } from "@/types";
+import type { StudyCardProps } from "@/types";
 import { formatStudyDate } from "@/utils/date";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
-
-interface StudyCardProps {
-  readonly study: Study;
-  readonly onClick: (id: string) => void;
-}
 
 export const StudyCard = ({ study, onClick }: StudyCardProps) => {
   const { t } = useTranslation();
@@ -20,8 +15,8 @@ export const StudyCard = ({ study, onClick }: StudyCardProps) => {
     <article
       role="button"
       tabIndex={0}
-      onClick={() => onClick(study.id)}
-      onKeyDown={(e) => e.key === "Enter" && onClick(study.id)}
+      onClick={() => onClick?.(study.id)}
+      onKeyDown={(e) => e.key === "Enter" && onClick?.(study.id)}
       aria-label={`Study for ${study.patientName}, ${formattedDate}`}
       className="group cursor-pointer rounded-xl border border-surface-border bg-surface-card p-4 transition-all hover:border-brand/40 hover:shadow-[0_0_0_1px_#7bf26c33] focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-surface"
     >
