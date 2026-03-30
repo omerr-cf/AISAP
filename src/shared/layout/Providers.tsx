@@ -8,10 +8,7 @@ import { I18nextProvider } from "react-i18next";
 
 /** Matches document background so the first paint does not flash white during Suspense. */
 const HydrationFallback = () => (
-  <div
-    className="min-h-screen w-full flex-1 bg-surface"
-    aria-hidden
-  />
+  <div className="min-h-screen w-full flex-1 bg-surface" aria-hidden />
 );
 
 export const Providers = ({
@@ -24,6 +21,7 @@ export const Providers = ({
       new QueryClient({
         defaultOptions: {
           queries: {
+            // Same static dataset assumption as useStudies — avoid surprise refetches.
             staleTime: Infinity,
             gcTime: Infinity,
             retry: 1,

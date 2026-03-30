@@ -17,7 +17,8 @@ interface StudyDetailPageProps {
 export const StudyDetailPage = ({ id }: StudyDetailPageProps) => {
   const { t } = useTranslation();
   const router = useRouter();
-  const { study, isLoading, isError, error, notFound } = useStudyDetail(id);
+  const { study, isLoading, isError, error, notFound, refetch } =
+    useStudyDetail(id);
 
   return (
     <div className="min-h-screen">
@@ -39,7 +40,10 @@ export const StudyDetailPage = ({ id }: StudyDetailPageProps) => {
           </div>
         )}
         {isError && (
-          <ErrorState message={toErrorMessage(error) ?? t("study.loadError")} />
+          <ErrorState
+            message={toErrorMessage(error) ?? t("study.loadError")}
+            onRetry={() => void refetch()}
+          />
         )}
         {notFound && <ErrorState message={t("study.notFound")} />}
         {study && <StudyDetail study={study} />}

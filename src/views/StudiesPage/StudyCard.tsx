@@ -5,20 +5,18 @@ import { Badge } from "@/shared/ui/Badge";
 import type { StudyCardProps } from "@/types";
 import { formatStudyDate } from "@/utils/date";
 import Image from "next/image";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-export const StudyCard = ({ study, onClick }: StudyCardProps) => {
+export const StudyCard = ({ study }: StudyCardProps) => {
   const { t } = useTranslation();
   const formattedDate = formatStudyDate(study.studyDate);
 
   return (
-    <article
-      role="button"
-      tabIndex={0}
-      onClick={() => onClick?.(study.id)}
-      onKeyDown={(e) => e.key === "Enter" && onClick?.(study.id)}
+    <Link
+      href={`/studies/${study.id}`}
       aria-label={`Study for ${study.patientName}, ${formattedDate}`}
-      className="group cursor-pointer rounded-xl border border-surface-border bg-surface-card p-4 transition-all hover:border-brand/40 hover:shadow-[0_0_0_1px_#7bf26c33] focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-surface"
+      className="group block rounded-xl border border-surface-border bg-surface-card p-4 transition-all hover:border-brand/40 hover:shadow-[0_0_0_1px_#7bf26c33] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
     >
       <div className="flex items-start gap-4">
         <Image
@@ -27,17 +25,17 @@ export const StudyCard = ({ study, onClick }: StudyCardProps) => {
           aria-hidden="true"
           width={48}
           height={48}
-          className="h-12 w-12 rounded-lg object-cover bg-surface-border flex-shrink-0"
+          className="h-12 w-12 flex-shrink-0 rounded-lg bg-surface-border object-cover"
         />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 flex-wrap">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="font-semibold text-content-primary group-hover:text-brand transition-colors truncate">
+              <p className="truncate font-semibold text-content-primary transition-colors group-hover:text-brand">
                 {study.patientName}
               </p>
               <p className="text-xs text-content-muted">{study.patientId}</p>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+            <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
               <LVEFBadge lvef={study.lvef} />
               <Badge variant={study.status === "pending" ? "brand" : "default"}>
                 {t(`status.${study.status}`)}
@@ -53,6 +51,6 @@ export const StudyCard = ({ study, onClick }: StudyCardProps) => {
           </div>
         </div>
       </div>
-    </article>
+    </Link>
   );
 };

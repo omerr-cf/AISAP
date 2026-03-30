@@ -6,7 +6,6 @@ import { ErrorState } from "@/shared/ui/ErrorState";
 import { Skeleton } from "@/shared/ui/Skeleton";
 import { toErrorMessage } from "@/utils/error";
 import { getPaginationItems } from "@/utils/pagination";
-import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { StudyCard } from "../StudyCard";
 import { useStudyListState } from "./useStudyListState";
@@ -16,7 +15,6 @@ const LIST_SHELL = "flex min-h-[34rem] flex-col";
 
 export const StudyList = () => {
   const { t } = useTranslation();
-  const router = useRouter();
   const {
     pageStudies,
     total,
@@ -25,6 +23,7 @@ export const StudyList = () => {
     isLoading,
     isError,
     error,
+    refetch,
     safePage,
     totalPages,
     setPage,
@@ -58,7 +57,10 @@ export const StudyList = () => {
   if (isError) {
     return (
       <div className={`${LIST_SHELL} justify-center`}>
-        <ErrorState message={toErrorMessage(error) ?? t("studies.loadError")} />
+        <ErrorState
+          message={toErrorMessage(error) ?? t("studies.loadError")}
+          onRetry={() => void refetch()}
+        />
       </div>
     );
   }
@@ -85,11 +87,7 @@ export const StudyList = () => {
 
       <div className="flex flex-col gap-3">
         {pageStudies.map((study) => (
-          <StudyCard
-            key={study.id}
-            study={study}
-            onClick={(id) => router.push(`/studies/${id}`)}
-          />
+          <StudyCard key={study.id} study={study} />
         ))}
       </div>
 

@@ -10,7 +10,7 @@ const EMPTY_STUDIES: readonly Study[] = [];
 
 export const useStudyListState = () => {
   const { filters, page, setPage } = useStudyFilters();
-  const { data, isLoading, isError, error } = useStudies();
+  const { data, isLoading, isError, error, refetch } = useStudies();
 
   const studies = data?.studies.filter(isStudyMatch(filters)) ?? EMPTY_STUDIES;
 
@@ -25,6 +25,7 @@ export const useStudyListState = () => {
     isLoading,
     isError,
     error,
+    refetch,
     safePage,
     totalPages,
     setPage,

@@ -6,8 +6,8 @@ Technical specification for the AISAP Frontend Challenge: a browser-based echoca
 
 ## Quick start (Docker)
 
-1. **Clone** this repository and `cd` into the project root.  
-2. **Run** `docker compose up --build`  
+1. **Clone** this repository and `cd` into the project root.
+2. **Run** `docker compose up --build`
 3. **Open** [http://localhost:3000](http://localhost:3000)
 
 The image bundles dependencies, the production Next.js build, and `data/studies.json`. No local Node.js install is required. To stop: `docker compose down`.
@@ -36,7 +36,7 @@ Canonical container definitions: `Dockerfile` and `docker-compose.yml` (multi-st
 - **Study detail** with patient and study metadata, LVEF value, category badge, and a progress indicator aligned with clinical color semantics.
 - **Single network fetch** for the full dataset: React Query caches `GET /api/studies` for the session; all filtering and paging are derived in memory.
 - **Internationalized UI** (English) with a single locale bundle.
-- **Containerized delivery** with Docker Compose and a CI workflow for lint and type-check.
+- **Containerized delivery** with Docker Compose and a CI workflow: lint, type-check, production **build**, and **Docker image build** verification.
 
 ---
 
@@ -44,15 +44,15 @@ Canonical container definitions: `Dockerfile` and `docker-compose.yml` (multi-st
 
 ### Stack
 
-| Layer | Choice | Role |
-| --- | --- | --- |
-| **Framework** | Next.js (App Router) | Routing, layouts, and the `GET /api/studies` route handler in one deployable unit. |
-| **Bundler** | Turbopack (Next.js) | Production build and dev tooling. |
-| **Styling** | Tailwind CSS v4 | Utility-first styling; design tokens live in `app/globals.css` (`@theme`). |
+| Layer            | Choice                  | Role                                                                                                        |
+| ---------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Framework**    | Next.js (App Router)    | Routing, layouts, and the `GET /api/studies` route handler in one deployable unit.                          |
+| **Bundler**      | Turbopack (Next.js)     | Production build and dev tooling.                                                                           |
+| **Styling**      | Tailwind CSS v4         | Utility-first styling; design tokens live in `app/globals.css` (`@theme`).                                  |
 | **Server state** | TanStack React Query v5 | One query key for studies; `staleTime` / `gcTime` set so the static dataset is not refetched automatically. |
-| **Validation** | Zod | Runtime parsing at HTTP and client boundaries; TypeScript types are inferred from schemas. |
-| **Language** | TypeScript (strict) | End-to-end typing without `any`. |
-| **Runtime** | Docker | Multi-stage image with Next.js `standalone` output and bundled `data/`. |
+| **Validation**   | Zod                     | Runtime parsing at HTTP and client boundaries; TypeScript types are inferred from schemas.                  |
+| **Language**     | TypeScript (strict)     | End-to-end typing without `any`.                                                                            |
+| **Runtime**      | Docker                  | Multi-stage image with Next.js `standalone` output and bundled `data/`.                                     |
 
 ### Data flow (list view)
 
@@ -228,7 +228,7 @@ The system shows patient and study sections, LVEF value, category badge, and a p
 ### Shared building blocks
 
 - **LVEFBadge** — color and label (normal / mildly reduced / severely reduced); color is not the only cue.
-- **StudyCard** — keyboard-activatable card linking to detail.
+- **StudyCard** — each row is a Next.js **`<Link>`** to `/studies/[id]` (native navigation, open in new tab, correct semantics).
 
 ---
 
@@ -251,13 +251,13 @@ npm run dev
 
 Brand and surface colors follow a **dark-first** layout with a single lime accent, aligned with [aisap.ai](https://www.aisap.ai/). **LVEF** uses distinct clinical colors (green / amber / red) so status remains obvious beyond brand styling.
 
-| Role | Hex | Notes |
-| --- | --- | --- |
-| Page / surface | `#0A0A0F` / `#111118` / `#1E1E2A` | Backgrounds and borders |
-| Brand | `#7BF26C` (with light / dim / glow variants) | Primary accent |
-| LVEF Normal | `#7BF26C` | ≥55% |
-| LVEF Mild | `#F5A623` | 40–54% |
-| LVEF Severe | `#EF4444` | <40% |
+| Role           | Hex                                          | Notes                   |
+| -------------- | -------------------------------------------- | ----------------------- |
+| Page / surface | `#0A0A0F` / `#111118` / `#1E1E2A`            | Backgrounds and borders |
+| Brand          | `#7BF26C` (with light / dim / glow variants) | Primary accent          |
+| LVEF Normal    | `#7BF26C`                                    | ≥55%                    |
+| LVEF Mild      | `#F5A623`                                    | 40–54%                  |
+| LVEF Severe    | `#EF4444`                                    | <40%                    |
 
 Implementation: **`app/globals.css`** defines `@theme` CSS variables (e.g. `--color-brand`, `--color-lvef-mild`); Tailwind v4 maps them to utilities such as `bg-brand`, `text-lvef-mild`.
 
@@ -266,6 +266,10 @@ Implementation: **`app/globals.css`** defines `@theme` CSS variables (e.g. `--co
 ## CI pipeline (extra credit)
 
 `.github/workflows/ci.yml` runs on pushes and pull requests to `main`:
+
+1. **lint-and-typecheck** — `npm run lint` and `npm run type-check`
+2. **build** — `npm run build` (runs after the first job succeeds)
+3. **docker-check** — `docker build -t aisap-test .` (runs after **build**)
 
 ```yaml
 name: CI
@@ -288,6 +292,25 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run type-check
+
+  build:
+    needs: lint-and-typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  docker-check:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t aisap-test .
 ```
 
 ---

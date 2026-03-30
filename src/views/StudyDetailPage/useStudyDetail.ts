@@ -10,10 +10,12 @@ export const useStudyDetail = (id: string) => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: STUDIES_QUERY_KEY,
     queryFn: fetchStudies,
     select: (res) => res.studies.find((s) => s.id === id),
+    // Static dataset from disk — no automatic refetch window.
     staleTime: Infinity,
     gcTime: Infinity,
   });
@@ -23,6 +25,7 @@ export const useStudyDetail = (id: string) => {
     isLoading,
     isError,
     error,
+    refetch,
     notFound: !isLoading && !isError && !study,
   };
 };
