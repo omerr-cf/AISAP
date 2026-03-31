@@ -33,7 +33,8 @@ Canonical container definitions: `Dockerfile` and `docker-compose.yml` (multi-st
 
 - **Study list** with patient search, LVEF category filter, and client-side pagination (URL-driven state).
 - **Study detail** with patient and study metadata, LVEF value, category badge, and a progress indicator aligned with clinical color semantics.
-- **Single network fetch** for the full dataset: React Query caches `GET /api/studies` for the session; all filtering and paging are derived in memory.
+- **Status toggle** — mark any study as Reviewed or Pending from the detail page; the change is reflected instantly on both the list and detail views via an in-memory override store and React Query cache update.
+- **Single network fetch** for the full dataset: React Query caches `GET /api/studies` for the session; all filtering, paging, and detail lookups are derived in memory.
 - **Internationalized UI** (English) with a single locale bundle.
 - **Containerized delivery** with Docker Compose and a CI workflow: lint, type-check, production **build**, and **Docker image build** verification.
 
@@ -45,7 +46,7 @@ Canonical container definitions: `Dockerfile` and `docker-compose.yml` (multi-st
 
 | Layer            | Choice                  | Role                                                                                                        |
 | ---------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Framework**    | Next.js (App Router)    | Routing, layouts, and the `GET /api/studies` route handler in one deployable unit.                          |
+| **Framework**    | Next.js (App Router)    | Routing, layouts, and the API route handlers in one deployable unit.                                        |
 | **Bundler**      | Turbopack (Next.js)     | Production build and dev tooling.                                                                           |
 | **Styling**      | Tailwind CSS v4         | Utility-first styling; design tokens live in `app/globals.css` (`@theme`).                                  |
 | **Server state** | TanStack React Query v5 | One query key for studies; `staleTime` / `gcTime` set so the static dataset is not refetched automatically. |
@@ -72,20 +73,42 @@ The list pipeline keeps **URL search params** as the source of truth for filters
 
 `useStudies()` issues a single `fetch` to `/api/studies` and validates with `StudiesResponseSchema`. **Study detail** reuses the same query key and applies a **`select`** function to resolve one study by `id`, so no second HTTP request is required when navigating from the list.
 
+### Status update flow
+
+```text
+  StudyInfoSection (button click)
+           │
+           ▼
+   useUpdateStudyStatus (useMutation)
+           │  mutationFn
+           ▼
+   PATCH /api/studies/[id]/status
+           │  setStatusOverride (in-memory store)
+           ▼
+   onSuccess → queryClient.setQueryData
+           │  rewrites cached study in place
+           ▼
+   List + Detail both re-render with new status
+```
+
+The in-memory override store (`src/lib/statusStore.ts`) persists changes for the server process lifetime and is applied by `GET /api/studies` on every subsequent fetch, so a page refresh reflects the updated status.
+
 ### High-level diagram
 
 ```text
 ┌────────────────────────── Browser ──────────────────────────┐
 │  /studies          /studies/[id]                             │
-│       │                    ▲                                  │
+│       │                    │                                 │
 │       └──── React Query (one cache for studies) ────────────┘
 └────────────────────────────┬────────────────────────────────┘
                              │ GET /api/studies (once)
+                        PATCH /api/studies/[id]/status
                              ▼
-              ┌──────────────────────────────┐
-              │  app/api/studies/route.ts    │
-              │  reads data/studies.json     │
-              └──────────────────────────────┘
+              ┌──────────────────────────────────────┐
+              │  app/api/studies/route.ts            │
+              │  app/api/studies/[id]/status/route.ts│
+              │  reads / overrides data/studies.json │
+              └──────────────────────────────────────┘
 ```
 
 ---
@@ -94,7 +117,7 @@ The list pipeline keeps **URL search params** as the source of truth for filters
 
 The codebase follows a **Zod-first** model: `src/lib/schemas/study.schema.ts` defines enums, `StudySchema`, `RawStudiesSchema` (array from disk), and `StudiesResponseSchema` (API shape). **TypeScript types** (`Study`, `StudiesResponse`, etc.) are **inferred** with `z.infer`—they are not duplicated by hand.
 
-`src/types/index.ts` is the **import boundary** for components: it re-exports schema types and declares UI-only types (`StudyFilters`, `StudyCardProps`, `LVEFFilter`, …) so views do not import schema modules directly.
+`src/types/index.ts` is the **import boundary** for components: it re-exports schema types and declares UI-only types (`StudyFilters`, `LVEFFilter`, `LVEFProgressBarProps`) so views do not import schema modules directly.
 
 ---
 
@@ -102,7 +125,7 @@ The codebase follows a **Zod-first** model: `src/lib/schemas/study.schema.ts` de
 
 ### `GET /api/studies`
 
-Returns the full dataset. Filtering and pagination are performed in the browser.
+Returns the full dataset with any in-memory status overrides applied. Filtering and pagination are performed in the browser.
 
 **200 OK** (illustrative):
 
@@ -126,61 +149,42 @@ Returns the full dataset. Filtering and pagination are performed in the browser.
 
 **500** `{ "error": "Failed to load studies" }`
 
-### Route handler
+### `PATCH /api/studies/[id]/status`
+
+Updates a study's status for the session lifetime via the in-memory override store.
+
+**Request body:** `{ "status": "reviewed" | "pending" }`
+
+**200 OK:** `{ "id": "1", "status": "reviewed" }`
+
+**400** `{ "error": "Invalid request" }` — Zod validation failure.
+
+### Client fetch functions
 
 ```ts
-// app/api/studies/route.ts
-import {
-  RawStudiesSchema,
-  type StudiesResponse,
-} from "@/lib/schemas/study.schema";
-import { promises as fs } from "fs";
-import { NextResponse } from "next/server";
-import path from "path";
+// src/api/studies.ts — GET: fetch + Zod parse
+export const fetchStudies = async (): Promise<StudiesResponse> => { … };
 
-export const GET = async (): Promise<
-  NextResponse<StudiesResponse | { error: string }>
-> => {
-  try {
-    const filePath = path.join(process.cwd(), "data", "studies.json");
-    const raw = await fs.readFile(filePath, "utf-8");
-    const studies = RawStudiesSchema.parse(JSON.parse(raw));
-    return NextResponse.json({ studies, total: studies.length });
-  } catch (err) {
-    console.error("[GET /api/studies]", err);
-    return NextResponse.json(
-      { error: "Failed to load studies" },
-      { status: 500 },
-    );
-  }
-};
+// src/api/updateStudyStatus.ts — PATCH: status mutation
+export const updateStudyStatus = async (
+  id: string,
+  status: StudyStatus,
+): Promise<{ id: string; status: StudyStatus }> => { … };
 ```
 
-### Client fetch + React Query
-
-```ts
-// src/api/studies.ts — native fetch + Zod parse
-export const fetchStudies = async (): Promise<StudiesResponse> => {
-  const res = await fetch("/api/studies");
-  if (!res.ok) throw new Error("Failed to load studies");
-  const data: unknown = await res.json();
-  return StudiesResponseSchema.parse(data);
-};
-```
+### React Query hooks
 
 ```ts
 // src/query/studiesQuery.ts
 export const useStudies = () =>
-  useQuery({
-    queryKey: STUDIES_QUERY_KEY,
-    queryFn: fetchStudies,
-    // staleTime: Infinity — static dataset, no background re-fetch
-    staleTime: Infinity,
-    gcTime: Infinity,
-  });
+  useQuery({ queryKey: STUDIES_QUERY_KEY, queryFn: fetchStudies, staleTime: Infinity, gcTime: Infinity });
+
+// src/query/useUpdateStudyStatus.ts
+export const useUpdateStudyStatus = () =>
+  useMutation({ mutationFn: …, onSuccess: ({ id, status }) => queryClient.setQueryData(…) });
 ```
 
-Detail views reuse the same cache and **select** a single row:
+Detail views reuse the same cache and **select** a single row — zero extra HTTP requests:
 
 ```ts
 useQuery({
@@ -198,18 +202,59 @@ useQuery({
 
 ```text
 AISAP/
-├── app/                    # App Router: layouts, pages, globals.css (@theme tokens)
-├── app/api/studies/        # GET handler → studies.json
-├── data/studies.json       # Bundled static dataset
+├── app/
+│   ├── api/
+│   │   ├── studies/route.ts              # GET /api/studies
+│   │   └── studies/[id]/status/route.ts  # PATCH /api/studies/[id]/status
+│   ├── studies/page.tsx                  # /studies
+│   ├── studies/[id]/page.tsx             # /studies/[id]
+│   └── globals.css                       # @theme design tokens (brand, surface, LVEF colors)
+├── data/studies.json                     # Bundled static dataset (100 studies)
 ├── src/
-│   ├── api/studies.ts      # fetch + Zod (client)
-│   ├── query/studiesQuery.ts
+│   ├── api/
+│   │   ├── studies.ts                    # fetchStudies (GET)
+│   │   └── updateStudyStatus.ts          # updateStudyStatus (PATCH)
+│   ├── query/
+│   │   ├── studiesQuery.ts               # STUDIES_QUERY_KEY + useStudies
+│   │   └── useUpdateStudyStatus.ts       # cache-updating mutation hook
 │   ├── lib/
-│   │   ├── i18n/           # i18next + en.json
-│   │   └── schemas/        # Zod schemas
-│   ├── utils/              # filters, pagination, dates
-│   ├── shared/             # layout, UI primitives, LVEFBadge
-│   └── views/              # StudiesPage, StudyDetailPage (+ co-located hooks)
+│   │   ├── i18n/                         # i18next config + en.json
+│   │   ├── schemas/study.schema.ts       # Zod schemas (single source of truth)
+│   │   └── statusStore.ts               # In-memory PATCH override store
+│   ├── types/index.ts                    # Re-exports + UI-only types
+│   ├── utils/
+│   │   ├── date.ts                       # formatStudyDate, formatStudyDateLong
+│   │   ├── error.ts                      # toErrorMessage
+│   │   ├── filters.ts                    # isStudyMatch predicate
+│   │   ├── pagination.ts                 # computePagination, getPaginationItems
+│   │   └── study.ts                      # getLVEFCategory, label maps
+│   ├── hooks/useDebounce.ts
+│   ├── shared/
+│   │   ├── layout/                       # Header, Providers
+│   │   ├── studies/LVEFBadge.tsx
+│   │   └── ui/                           # Badge, Button, Field, Section, Skeleton, …
+│   └── views/
+│       ├── StudiesPage/
+│       │   ├── StudiesPage.tsx           # Page shell (Header + main)
+│       │   └── Components/
+│       │       ├── StudyCard.tsx
+│       │       ├── StudyList.tsx         # Data + states (loading/error/empty)
+│       │       ├── StudyListSkeleton.tsx
+│       │       ├── StudyListPagination.tsx
+│       │       ├── useStudyListState.ts
+│       │       └── StudyFilters/
+│       │           ├── StudyFilters.tsx
+│       │           └── useStudyFilters.ts  # URL state owner
+│       └── StudyDetailPage/
+│           ├── StudyDetailPage.tsx       # Page shell (Header + main + back link)
+│           └── StudyDetails/
+│               ├── StudyDetail.tsx       # Guards + section composition
+│               ├── useStudyDetail.ts     # select from shared cache
+│               └── Components/
+│                   ├── PatientInfoSection.tsx
+│                   ├── StudyInfoSection.tsx  # Status badge + toggle button
+│                   ├── LVEFSection.tsx
+│                   └── LVEFProgressBar.tsx
 └── Dockerfile, docker-compose.yml, .github/workflows/ci.yml
 ```
 
@@ -219,11 +264,13 @@ AISAP/
 
 ### Study list (`/studies`)
 
-The system renders **StudyFilters** (debounced search + LVEF select) and **StudyList** (cards, truncated pagination). Filter and page state are reflected in the URL (`?q=&lvef=&page=`). While the initial query loads, skeleton placeholders match the list layout to limit layout shift.
+Renders **StudyFilters** (debounced search + LVEF select) and **StudyList** (cards, truncated pagination). Filter and page state are reflected in the URL (`?q=&lvef=&page=`). While the initial query loads, skeleton placeholders match the list layout to limit layout shift.
 
 ### Study detail (`/studies/[id]`)
 
-The system shows patient and study sections, LVEF value, category badge, and a progress bar with appropriate **ARIA** attributes. Navigation back to the list is provided via the app router.
+Shows three sections: **Patient Information** (name, patient ID), **Study Information** (date, indication, status badge with toggle button), and **LVEF** (value, category badge, accessible progress bar). Navigation back to the list is provided via the app router.
+
+The **status toggle** sends `PATCH /api/studies/[id]/status` and updates the React Query cache in place — no refetch required. Both the list and the detail page reflect the change immediately.
 
 ### Shared building blocks
 
