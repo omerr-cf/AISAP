@@ -1,7 +1,6 @@
 "use client";
 
 import { useDebounce } from "@/hooks/useDebounce";
-import { useHasMounted } from "@/hooks/useHasMounted";
 import type { LVEFFilter, StudyFilters } from "@/types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -18,7 +17,6 @@ export const useStudyFilters = () => {
 
   const [searchInput, setSearchInput] = useState(searchParams.get("q") ?? "");
   const debouncedSearch = useDebounce(searchInput, 300);
-  const hasMounted = useHasMounted();
 
   // Single source of truth: all URL params parsed in one place.
   const page = parseInt(searchParams.get("page") ?? "1", 10);
@@ -44,16 +42,16 @@ export const useStudyFilters = () => {
     [router],
   );
 
-  // Sync typed search to URL only after mount and only when debounced value differs from URL.
-  // Avoids router.replace on hydration (was causing multi-pass flicker with useSearchParams).
+  // Sync debounced search → URL in a microtask so it runs after paint (avoids hydration flicker / replace loops).
   useEffect(() => {
-    if (!hasMounted) return;
-    const params = new URLSearchParams(searchParamsRef.current.toString());
-    const currentQ = (params.get("q") ?? "").trim();
-    const nextQ = debouncedSearch.trim();
-    if (currentQ === nextQ) return;
-    updateQueryParams({ q: debouncedSearch || null, page: "1" });
-  }, [hasMounted, debouncedSearch, updateQueryParams]);
+    queueMicrotask(() => {
+      const params = new URLSearchParams(searchParamsRef.current.toString());
+      const currentQ = (params.get("q") ?? "").trim();
+      const nextQ = debouncedSearch.trim();
+      if (currentQ === nextQ) return;
+      updateQueryParams({ q: debouncedSearch || null, page: "1" });
+    });
+  }, [debouncedSearch, updateQueryParams]);
 
   const setLVEFFilter = (value: LVEFFilter): void =>
     updateQueryParams({ lvef: value === "all" ? null : value, page: "1" });

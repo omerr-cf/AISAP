@@ -120,7 +120,7 @@ Returns the full dataset. Filtering and pagination are performed in the browser.
       "thumbnailUrl": "https://picsum.photos/seed/study-001-97922/150/150"
     }
   ],
-  "total": 120
+  "total": 100
 }
 ```
 
