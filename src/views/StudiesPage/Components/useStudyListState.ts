@@ -4,7 +4,7 @@ import { useStudies } from "@/query/studiesQuery";
 import type { Study } from "@/types";
 import { isStudyMatch } from "@/utils/filters";
 import { computePagination } from "@/utils/pagination";
-import { useStudyFilters } from "@/views/StudiesPage/StudyFilters/useStudyFilters";
+import { useStudyFilters } from "@/views/StudiesPage/Components/StudyFilters/useStudyFilters";
 
 const EMPTY_STUDIES: readonly Study[] = [];
 

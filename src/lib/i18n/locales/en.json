@@ -35,7 +35,10 @@
     "backToStudies": "← Back to Studies",
     "lvefProgress": "LVEF Progress: {{value}}%",
     "notFound": "Study not found.",
-    "loadError": "Failed to load study."
+    "loadError": "Failed to load study.",
+    "markReviewed": "Mark as Reviewed",
+    "markPending": "Mark as Pending",
+    "updating": "Updating…"
   },
   "status": {
     "pending": "Pending",

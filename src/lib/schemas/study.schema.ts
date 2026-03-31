@@ -1,3 +1,28 @@
+// ─── ZOD SCHEMA — SINGLE SOURCE OF TRUTH ─────────────────────────────────────
+// All TypeScript types for Study data are INFERRED from these schemas via
+// z.infer<typeof …>. We never write types by hand alongside schemas because they
+// would drift: the schema validates runtime values; the type covers compile time.
+// Keeping them as one thing eliminates an entire class of bugs.
+//
+// HOW TO DEBUG ZOD ERRORS AT RUNTIME:
+//   • .parse(data)       — throws ZodError on invalid data (used in production)
+//   • .safeParse(data)   — returns { success, data } | { success: false, error }
+//                          (use this in tests or when you want to inspect errors)
+//
+// Example — trigger and inspect a parse error in a browser/Node console:
+//   import { StudySchema } from "@/lib/schemas/study.schema";
+//   const result = StudySchema.safeParse({ id: 1 }); // id should be string
+//   if (!result.success) console.log(result.error.issues);
+//   // → [{ code: "invalid_type", expected: "string", received: "number", path: ["id"] }]
+//
+// HOW TO MOCK A VALID STUDY IN TESTS:
+//   const mockStudy: Study = {
+//     id: "1", patientName: "Test Patient", patientId: "P-00001",
+//     studyDate: "2025-01-15", indication: "Chest pain", lvef: 60,
+//     status: "pending", thumbnailUrl: "https://picsum.photos/seed/test/150/150",
+//   };
+// ──────────────────────────────────────────────────────────────────────────────
+
 import { z } from "zod";
 
 // ---------------------------------------------------------------------------

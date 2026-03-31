@@ -3,8 +3,8 @@
 import { Header } from "@/shared/layout/Header";
 import { Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { StudyFilters } from "./StudyFilters/StudyFilters";
-import { StudyList } from "./StudyList/StudyList";
+import { StudyFilters } from "./Components/StudyFilters/StudyFilters";
+import { StudyList } from "./Components/StudyList";
 
 export const StudiesPage = () => {
   const { t } = useTranslation();

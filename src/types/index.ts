@@ -12,15 +12,16 @@ export type {
 // UI-only types — not part of the API schema
 // ---------------------------------------------------------------------------
 
-import type { LVEFCategory, Study } from "@/lib/schemas/study.schema";
+import type { LVEFCategory } from "@/lib/schemas/study.schema";
 
 export type LVEFFilter = LVEFCategory | "all";
-
-export type StudyCardProps = Readonly<{
-  study: Study;
-}>;
 
 export type StudyFilters = Readonly<{
   query: string;
   lvef: LVEFFilter;
 }>;
+
+export type LVEFProgressBarProps = {
+  readonly lvef: number;
+  readonly lvefCategory: LVEFCategory;
+};

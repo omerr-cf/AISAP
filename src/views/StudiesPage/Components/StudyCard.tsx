@@ -2,13 +2,13 @@
 
 import { LVEFBadge } from "@/shared/studies/LVEFBadge";
 import { Badge } from "@/shared/ui/Badge";
-import type { StudyCardProps } from "@/types";
+import type { Study } from "@/types";
 import { formatStudyDate } from "@/utils/date";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-export const StudyCard = ({ study }: StudyCardProps) => {
+export const StudyCard = (study: Study) => {
   const { t } = useTranslation();
   const formattedDate = formatStudyDate(study.studyDate);
 
