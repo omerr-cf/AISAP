@@ -16,7 +16,6 @@ import {
   RawStudiesSchema,
   type StudiesResponse,
 } from "@/lib/schemas/study.schema";
-import { getStatusOverride } from "@/lib/statusStore";
 import { promises as fs } from "fs";
 import { NextResponse } from "next/server";
 import path from "path";
@@ -38,14 +37,7 @@ export const GET = async (): Promise<
     // response shape that the client expects. We build that shape below by
     // wrapping the parsed array. Using the wrong schema here would throw a
     // ZodError at startup because the file doesn't contain a `total` field.
-    const rawStudies = RawStudiesSchema.parse(JSON.parse(raw));
-
-    // Apply any in-memory status overrides (from PATCH /api/studies/[id]/status).
-    // Overrides take precedence over the JSON file value for the session lifetime.
-    const studies = rawStudies.map((study) => ({
-      ...study,
-      status: getStatusOverride(study.id) ?? study.status,
-    }));
+    const studies = RawStudiesSchema.parse(JSON.parse(raw));
 
     return NextResponse.json({ studies, total: studies.length });
   } catch (err) {

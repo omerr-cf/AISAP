@@ -62,6 +62,12 @@ export const StudiesResponseSchema = z.object({
   total: z.number(),
 });
 
+// Shape returned by PATCH /api/studies/[id]/status
+export const UpdateStudyStatusResponseSchema = z.object({
+  id: z.string(),
+  status: StudyStatusSchema,
+});
+
 // ---------------------------------------------------------------------------
 // Inferred TypeScript types — never written by hand
 // ---------------------------------------------------------------------------

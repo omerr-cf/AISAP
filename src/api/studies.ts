@@ -1,7 +1,8 @@
-// ─── CLIENT-SIDE API BOUNDARY ─────────────────────────────────────────────────
-// This is the ONLY place in the app that talks to the backend.
-// React Query calls these functions via queryFn/mutationFn and owns the
-// lifecycle (caching, retries, error state).  Components never call these directly.
+// ─── CLIENT-SIDE API BOUNDARY — READ (GET /api/studies) ──────────────────────
+// Responsible for fetching the full study list. React Query calls this via
+// `queryFn: fetchStudies` and owns the lifecycle (caching, retries, errors).
+// Status mutations live in src/api/updateStudyStatus.ts (PATCH).
+// Components never call this directly — they use the hooks.
 // ──────────────────────────────────────────────────────────────────────────────
 
 import {

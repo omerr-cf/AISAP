@@ -1,3 +1,4 @@
+import { UpdateStudyStatusResponseSchema } from "@/lib/schemas/study.schema";
 import type { StudyStatus } from "@/types";
 
 export const updateStudyStatus = async (
@@ -12,5 +13,6 @@ export const updateStudyStatus = async (
 
   if (!res.ok) throw new Error("Failed to update study status");
 
-  return res.json() as Promise<{ id: string; status: StudyStatus }>;
+  const data: unknown = await res.json();
+  return UpdateStudyStatusResponseSchema.parse(data);
 };

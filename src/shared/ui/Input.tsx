@@ -7,7 +7,7 @@ export const Input = ({ className, ...props }: InputProps) => (
     className={clsx(
       "w-full rounded-lg bg-surface-card border border-surface-border",
       "px-3 py-2 text-sm text-content-primary placeholder:text-content-muted",
-      "focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent",
+      "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-transparent",
       "transition-colors",
       className,
     )}

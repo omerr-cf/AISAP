@@ -34,7 +34,7 @@ Canonical container definitions: `Dockerfile` and `docker-compose.yml` (multi-st
 
 - **Study list** with patient search, LVEF category filter, and client-side pagination (URL-driven state).
 - **Study detail** with patient and study metadata, LVEF value, category badge, and a progress indicator aligned with clinical color semantics.
-- **Status toggle** — mark any study as Reviewed or Pending from the detail page; the change is reflected instantly on both the list and detail views via an in-memory override store and React Query cache update.
+- **Status toggle** — mark any study as Reviewed or Pending from the detail page. The PATCH route writes the new status directly to `data/studies.json`, so changes persist across page refreshes and server restarts. The React Query cache is updated in place so both the list and detail views reflect the change instantly — no refetch required.
 - **Single network fetch** for the full dataset: React Query caches `GET /api/studies` for the session; all filtering, paging, and detail lookups are derived in memory.
 - **Internationalized UI** (English) with a single locale bundle.
 - **Containerized delivery** with Docker Compose and a CI workflow: lint, type-check, production **build**, and **Docker image build** verification.
@@ -81,18 +81,19 @@ The list pipeline keeps **URL search params** as the source of truth for filters
            │
            ▼
    useUpdateStudyStatus (useMutation)
-           │  mutationFn
+           │  mutationFn: PATCH /api/studies/[id]/status
            ▼
-   PATCH /api/studies/[id]/status
-           │  setStatusOverride (in-memory store)
+   Route handler reads data/studies.json
+           │  maps over studies, replaces status for matched id
+           │  fs.writeFile → persists to disk
            ▼
    onSuccess → queryClient.setQueryData
-           │  rewrites cached study in place
+           │  rewrites cached study in place (no refetch)
            ▼
    List + Detail both re-render with new status
 ```
 
-The in-memory override store (`src/lib/statusStore.ts`) persists changes for the server process lifetime and is applied by `GET /api/studies` on every subsequent fetch, so a page refresh reflects the updated status.
+Status changes are written directly to `data/studies.json` by the route handler, so they survive page refreshes and server restarts. The file resets to its original state only when the Docker image is rebuilt.
 
 ### High-level diagram
 
@@ -108,7 +109,7 @@ The in-memory override store (`src/lib/statusStore.ts`) persists changes for the
               ┌──────────────────────────────────────┐
               │  app/api/studies/route.ts            │
               │  app/api/studies/[id]/status/route.ts│
-              │  reads / overrides data/studies.json │
+              │  reads + writes data/studies.json    │
               └──────────────────────────────────────┘
 ```
 
@@ -126,7 +127,7 @@ The codebase follows a **Zod-first** model: `src/lib/schemas/study.schema.ts` de
 
 ### `GET /api/studies`
 
-Returns the full dataset with any in-memory status overrides applied. Filtering and pagination are performed in the browser.
+Returns the full dataset from `data/studies.json` (including any status changes written by PATCH). Filtering and pagination are performed in the browser.
 
 **200 OK** (illustrative):
 
@@ -152,7 +153,7 @@ Returns the full dataset with any in-memory status overrides applied. Filtering 
 
 ### `PATCH /api/studies/[id]/status`
 
-Updates a study's status for the session lifetime via the in-memory override store.
+Writes the new status directly to `data/studies.json`. Changes persist across page refreshes and server restarts until the container is rebuilt.
 
 **Request body:** `{ "status": "reviewed" | "pending" }`
 
@@ -220,8 +221,7 @@ AISAP/
 │   │   └── useUpdateStudyStatus.ts       # cache-updating mutation hook
 │   ├── lib/
 │   │   ├── i18n/                         # i18next config + en.json
-│   │   ├── schemas/study.schema.ts       # Zod schemas (single source of truth)
-│   │   └── statusStore.ts               # In-memory PATCH override store
+│   │   └── schemas/study.schema.ts       # Zod schemas + inferred TS types (single source of truth)
 │   ├── types/index.ts                    # Re-exports + UI-only types
 │   ├── utils/
 │   │   ├── date.ts                       # formatStudyDate, formatStudyDateLong
@@ -249,7 +249,7 @@ AISAP/
 │       └── StudyDetailPage/
 │           ├── StudyDetailPage.tsx       # Page shell (Header + main + back link)
 │           └── StudyDetails/
-│               ├── StudyDetail.tsx       # Guards + section composition
+│               ├── StudyDetail.tsx       # Data fetching, guards, mutation, section composition
 │               ├── useStudyDetail.ts     # select from shared cache
 │               └── Components/
 │                   ├── PatientInfoSection.tsx
