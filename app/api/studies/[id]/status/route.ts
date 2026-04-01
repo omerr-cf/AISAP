@@ -5,11 +5,6 @@
 import { StudyStatusSchema } from "@/lib/schemas/study.schema";
 import { setStatusOverride } from "@/lib/statusStore";
 import { NextResponse } from "next/server";
-import { z } from "zod";
-
-const UpdateStatusBody = z.object({
-  status: StudyStatusSchema,
-});
 
 export const PATCH = async (
   request: Request,
@@ -17,8 +12,8 @@ export const PATCH = async (
 ): Promise<NextResponse> => {
   try {
     const { id } = await params;
-    const body: unknown = await request.json();
-    const { status } = UpdateStatusBody.parse(body);
+    const body = (await request.json()) as Record<string, unknown>;
+    const status = StudyStatusSchema.parse(body.status);
 
     setStatusOverride(id, status);
 

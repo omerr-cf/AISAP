@@ -7,8 +7,9 @@ Technical specification for the AISAP Frontend Challenge: a browser-based echoca
 ## Quick start (Docker)
 
 1. **Clone** this repository and `cd` into the project root.
-2. **Run** `docker compose up --build`
-3. **Open** [http://localhost:3000](http://localhost:3000)
+2. **Run** `npm install` (for IDE / type-checker support — not required to run the app)
+3. **Run** `docker compose up --build`
+4. **Open** [http://localhost:3000](http://localhost:3000)
 
 The image bundles dependencies, the production Next.js build, and `data/studies.json`. No local Node.js install is required. To stop: `docker compose down`.
 
@@ -287,6 +288,8 @@ Requires Node.js 20+.
 npm install
 npm run dev
 ```
+
+> **Note for Docker users:** `docker compose up --build` installs dependencies _inside the container only_. Your host `node_modules` stays empty, so the IDE's TypeScript server will report missing module errors (`Cannot find module 'react'`, etc.) until you run `npm install` locally. The app itself is unaffected — this is purely an IDE / type-checker concern.
 
 **Production build:** `npm run build` then `npm start`
 
